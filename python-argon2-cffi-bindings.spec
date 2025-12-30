@@ -3,7 +3,7 @@
 
 Name:		python-argon2-cffi-bindings
 Version:	21.2.0
-Release:	2
+Release:	3
 Summary:	Low-level CFFI bindings for Argon2
 URL:		https://pypi.org/project/argon2-cffi-bindings/
 License:	MIT
