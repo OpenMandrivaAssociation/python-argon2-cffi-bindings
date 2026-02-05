@@ -1,14 +1,15 @@
 %define module argon2-cffi-bindings
-%define uname argon2_cffi_bindings
+%define oname argon2_cffi_bindings
+%bcond tests 1
 
 Name:		python-argon2-cffi-bindings
-Version:	21.2.0
-Release:	3
+Version:	25.1.0
+Release:	1
 Summary:	Low-level CFFI bindings for Argon2
 URL:		https://pypi.org/project/argon2-cffi-bindings/
 License:	MIT
 Group:		Development/Python
-Source0:	https://files.pythonhosted.org/packages/source/a/%{module}/%{module}-%{version}.tar.gz
+Source0:	https://files.pythonhosted.org/packages/source/a/%{oname}/%{oname}-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildSystem:	python
 
 BuildRequires:	pkgconfig
@@ -16,39 +17,44 @@ BuildRequires:	python
 BuildRequires:	python-cython
 BuildRequires:	pkgconfig(python3)
 BuildRequires:	pkgconfig(libargon2)
-BuildRequires:	python-setuptools
-BuildRequires:	python-setuptools_scm
-BuildRequires:	python-cffi
-BuildRequires:	python-hypothesis
-BuildRequires:	python-pip
-BuildRequires:	python-pytest
-
-Requires:	python-cffi >= 1.0.1
+BuildRequires:	python%{pyver}dist(cffi)
+BuildRequires:	python%{pyver}dist(hypothesis)
+BuildRequires:	python%{pyver}dist(setuptools)
+BuildRequires:	python%{pyver}dist(setuptools-scm)
+BuildRequires:	python%{pyver}dist(pip)
+BuildRequires:	python%{pyver}dist(wheel)
+%if %{with tests}
+BuildRequires:	python%{pyver}dist(pytest)
+%endif
+Requires:	python%{pyver}dist(cffi) >= 2.0
 
 %description
 %{module} provides low-level CFFI bindings to the official
 implementation of the Argon2 password hashing algorithm.
 
-%prep
-%autosetup -p1 -n %{module}-%{version}
+%prep -a
+# Remove upstream's egg-info
+rm -vrf src/%{oname}.egg-info
 
-%build
+%build -p
 #export CFLAGS="%{optflags}"
-export LDFLAGS="%{optflags} -v"
+export LDFLAGS="%{ldflags} -lpython%{pyver} -v"
 %ifarch %arm aarch64 riscv64
 	export ARGON2_CFFI_USE_SSE2=0
 %else
 	export ARGON2_CFFI_USE_SSE2=1
 %endif
 export ARGON2_CFFI_USE_SYSTEM=1
-%py_build
 
-%install
-%py3_install
-
+%if %{with tests}
+%check
+export CI=true
+export PYTHONPATH="%{buildroot}%{python_sitearch}:${PWD}"
+pytest -v
+%endif
 
 %files
-%{python_sitearch}/_%{uname}
-%{python_sitearch}/%{uname}-%{version}*-info
-%doc README.md CHANGELOG.md
+%doc README.md
 %license LICENSE
+%{python_sitearch}/_%{oname}
+%{python_sitearch}/%{oname}-%{version}.dist-info
