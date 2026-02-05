@@ -26,7 +26,7 @@ BuildRequires:	python%{pyver}dist(wheel)
 %if %{with tests}
 BuildRequires:	python%{pyver}dist(pytest)
 %endif
-Requires:	python%{pyver}dist(cffi) >= 2.0
+Requires:	python%{pyver}dist(cffi) >= 2
 
 %description
 %{module} provides low-level CFFI bindings to the official
