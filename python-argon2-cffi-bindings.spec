@@ -3,7 +3,7 @@
 %bcond tests 1
 
 Name:		python-argon2-cffi-bindings
-Version:	25.1.0
+Version:	26.1.0
 Release:	1
 Summary:	Low-level CFFI bindings for Argon2
 URL:		https://pypi.org/project/argon2-cffi-bindings/
@@ -14,12 +14,12 @@ BuildSystem:	python
 
 BuildRequires:	pkgconfig
 BuildRequires:	python
-BuildRequires:	python-cython
+BuildRequires:	cmake
+BuildRequires:	ninja
 BuildRequires:	pkgconfig(python3)
 BuildRequires:	pkgconfig(libargon2)
 BuildRequires:	python%{pyver}dist(cffi)
-BuildRequires:	python%{pyver}dist(hypothesis)
-BuildRequires:	python%{pyver}dist(setuptools)
+BuildRequires:	python%{pyver}dist(scikit-build-core)
 BuildRequires:	python%{pyver}dist(setuptools-scm)
 BuildRequires:	python%{pyver}dist(pip)
 BuildRequires:	python%{pyver}dist(wheel)
@@ -39,6 +39,9 @@ rm -vrf src/%{oname}.egg-info
 %build -p
 #export CFLAGS="%{optflags}"
 export LDFLAGS="%{ldflags} -lpython%{pyver} -v"
+# The PyPI sdist ships an unexpanded .git_archival.txt, so setuptools-scm
+# cannot see a git tag offline.
+export SETUPTOOLS_SCM_PRETEND_VERSION=%{version}
 %ifarch %arm aarch64 riscv64
 	export ARGON2_CFFI_USE_SSE2=0
 %else
