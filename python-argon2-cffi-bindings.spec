@@ -1,6 +1,9 @@
 %define module argon2-cffi-bindings
 %define oname argon2_cffi_bindings
 %bcond tests 1
+# scikit-build-core's Release wheel has no debug info, so find-debuginfo
+# writes an empty debugsource manifest and rpm aborts.
+%global _empty_manifest_terminate_build 0
 
 Name:		python-argon2-cffi-bindings
 Version:	26.1.0
@@ -42,6 +45,7 @@ export LDFLAGS="%{ldflags} -lpython%{pyver} -v"
 # The PyPI sdist ships an unexpanded .git_archival.txt, so setuptools-scm
 # cannot see a git tag offline.
 export SETUPTOOLS_SCM_PRETEND_VERSION=%{version}
+export SKBUILD_CMAKE_BUILD_TYPE=RelWithDebInfo
 %ifarch %arm aarch64 riscv64
 	export ARGON2_CFFI_USE_SSE2=0
 %else
